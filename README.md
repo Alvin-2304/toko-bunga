@@ -1,1 +1,203 @@
-# toko-bunga
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Toko Bunga Anjay Kembangan</title>
+<style>
+  /* Reset dan dasar */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .container {
+    background: #fff;
+    width: 95%;
+    max-width: 420px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    padding: 25px 30px;
+  }
+  h1 {
+    text-align: center;
+    color: #d81e5b;
+    margin-bottom: 25px;
+    font-weight: 700;
+    font-size: 2rem;
+    font-family: 'Poppins', sans-serif;
+  }
+  label {
+    display: block;
+    margin: 15px 0 6px 0;
+    font-weight: 600;
+    color: #444;
+  }
+  select, input[type="number"], textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: 2px solid #d81e5b;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+    transition: border-color 0.3s ease;
+    outline-offset: 2px;
+  }
+  select:focus, input[type="number"]:focus, textarea:focus {
+    border-color: #ff4081;
+  }
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  .total {
+    margin-top: 20px;
+    text-align: right;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #388e3c;
+    letter-spacing: 0.02em;
+  }
+  button {
+    margin-top: 30px;
+    width: 100%;
+    background-color: #d81e5b;
+    color: #fff;
+    font-size: 1.2rem;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+    box-shadow: 0 5px 15px rgba(216,30,91,0.5);
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #ad1747;
+    box-shadow: 0 7px 20px rgba(173,23,71,0.7);
+  }
+  .confirmation {
+    margin-top: 20px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #2e7d32;
+    display: none;
+  }
+  @media (max-width: 480px) {
+    .container {
+      padding: 20px 20px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Toko Bunga Anjay Kembangan</h1>
+    <form id="orderForm">
+      <label for="bunga">Pilih Varian Bunga</label>
+      <select id="bunga" required>
+        <option value="" data-price="0">-- Pilih bunga --</option>
+        <option value="Mawar Merah" data-price="50000">Mawar Merah - Rp50.000</option>
+        <option value="Mawar Putih" data-price="55000">Mawar Putih - Rp55.000</option>
+        <option value="Tulip" data-price="60000">Tulip - Rp60.000</option>
+        <option value="Anggrek" data-price="75000">Anggrek - Rp75.000</option>
+        <option value="Lili" data-price="65000">Lili - Rp65.000</option>
+        <option value="Krisan" data-price="70000">Krisan - Rp70.000</option>
+        <option value="Gerbera" data-price="68000">Gerbera - Rp68.000</option>
+      </select>
+
+      <label for="jumlah">Jumlah</label>
+      <input type="number" id="jumlah" min="1" value="1" required />
+
+      <label for="catatan">Catatan Khusus (opsional)</label>
+      <textarea id="catatan" placeholder="Misal: bungkus dengan kertas merah..."></textarea>
+
+      <div class="total" id="totalHarga">Total Harga: Rp0</div>
+
+      <button type="submit">✅ Kirim pesanan ke WhatsApp</button>
+
+      <div class="confirmation" id="confirmationMsg">Pesanan berhasil dikirim!</div>
+    </form>
+  </div>
+
+<script>
+  const bungaSelect = document.getElementById('bunga');
+  const jumlahInput = document.getElementById('jumlah');
+  const totalHargaDiv = document.getElementById('totalHarga');
+  const form = document.getElementById('orderForm');
+  const confirmationMsg = document.getElementById('confirmationMsg');
+  const nomorWA = '628973707720';
+
+  function formatRupiah(number) {
+    return 'Rp' + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+
+  function updateTotalHarga() {
+    const harga = Number(bungaSelect.options[bungaSelect.selectedIndex].dataset.price) || 0;
+    const qty = Number(jumlahInput.value) || 1;
+    const total = harga * qty;
+    totalHargaDiv.textContent = `Total Harga: ${formatRupiah(total)}`;
+    return total;
+  }
+
+  bungaSelect.addEventListener('change', updateTotalHarga);
+  jumlahInput.addEventListener('input', () => {
+    if(jumlahInput.value < 1) jumlahInput.value = 1;
+    updateTotalHarga();
+  });
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+
+    const bunga = bungaSelect.value;
+    const harga = Number(bungaSelect.options[bungaSelect.selectedIndex].dataset.price);
+    const jumlah = Number(jumlahInput.value);
+    const catatan = document.getElementById('catatan').value.trim();
+
+    if(!bunga) {
+      alert('Silakan pilih varian bunga!');
+      return;
+    }
+    if(jumlah < 1) {
+      alert('Jumlah minimal 1!');
+      return;
+    }
+
+    const total = harga * jumlah;
+
+    let pesan = `*Pesanan dari Toko Bunga Anjay Kembangan*\n`;
+    pesan += `----------------------------\n`;
+    pesan += `🌺 Bunga: ${bunga}\n`;
+    pesan += `📦 Jumlah: ${jumlah}\n`;
+    pesan += `💰 Total Harga: ${formatRupiah(total)}\n`;
+    if(catatan) pesan += `📝 Catatan: ${catatan}\n`;
+    pesan += `----------------------------\n`;
+    pesan += `Terima kasih atas pesanan Anda!`;
+
+    const pesanEncoded = encodeURIComponent(pesan);
+    const waURL = `https://wa.me/${nomorWA}?text=${pesanEncoded}`;
+
+    window.open(waURL, '_blank');
+
+    confirmationMsg.style.display = 'block';
+
+    setTimeout(() => {
+      confirmationMsg.style.display = 'none';
+      form.reset();
+      updateTotalHarga();
+    }, 4000);
+  });
+
+  updateTotalHarga();
+</script>
+</body>
+</html>
